@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.tgz
+target/
+__pycache__/
+*.egg-info/
+.pytest_cache/

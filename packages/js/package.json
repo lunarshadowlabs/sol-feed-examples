@@ -1,0 +1,39 @@
+{
+  "name": "sol-feed",
+  "version": "0.1.0",
+  "description": "Client for the Lunar Shadow Labs feed: decoded Solana DEX swaps, launches and pool events over one WebSocket",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepack": "tsc",
+    "test": "tsc && node --test test/*.test.js"
+  },
+  "keywords": ["solana", "dex", "websocket", "market-data", "pump.fun", "raydium", "meteora", "orca", "token-2022"],
+  "homepage": "https://lunarshadowlabs.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lunarshadowlabs/sol-feed-examples.git",
+    "directory": "packages/js"
+  },
+  "bugs": {
+    "email": "support@lunarshadowlabs.com"
+  },
+  "author": "Lunar Shadow Labs <support@lunarshadowlabs.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
