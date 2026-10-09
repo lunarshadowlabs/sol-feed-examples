@@ -1,6 +1,6 @@
 {
   "name": "sol-feed",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Client for the Lunar Shadow Labs feed: decoded Solana DEX swaps, launches and pool events over one WebSocket",
   "type": "module",
   "main": "./dist/index.js",

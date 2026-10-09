@@ -26,7 +26,7 @@ from urllib.parse import urlencode
 from websockets.asyncio.client import connect
 from websockets.exceptions import ConnectionClosed, InvalidStatus, WebSocketException
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["Feed", "FeedError", "AuthError", "ui_amount", "DEFAULT_URL"]
 
 DEFAULT_URL = "wss://feed.lunarshadowlabs.com/ws"
