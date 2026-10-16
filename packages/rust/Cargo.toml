@@ -1,0 +1,26 @@
+[package]
+name = "sol-feed"
+version = "0.1.1"
+edition = "2021"
+rust-version = "1.80"
+description = "Rust client for the Lunar Shadow Labs feed: decoded Solana DEX swaps, launches and pool events over one WebSocket"
+license = "MIT"
+repository = "https://github.com/lunarshadowlabs/sol-feed-examples"
+homepage = "https://lunarshadowlabs.com"
+documentation = "https://docs.rs/sol-feed"
+readme = "README.md"
+keywords = ["solana", "dex", "websocket", "market-data", "pump-fun"]
+categories = ["api-bindings", "asynchronous", "network-programming", "web-programming::websocket"]
+include = ["src/**", "tests/**", "Cargo.toml", "README.md", "LICENSE"]
+
+[dependencies]
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+# TLS is rustls with the ring provider and the Mozilla roots: no OpenSSL, no aws-lc build.
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time"] }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "handshake", "rustls-tls-webpki-roots"] }
+webpki-roots = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "time", "sync"] }

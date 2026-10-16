@@ -1,15 +1,17 @@
-# Publishes the client packages with trusted publishing (OIDC): no npm or PyPI token is
-# stored anywhere. Push a tag to release:
+# Publishes the client packages with trusted publishing (OIDC): no npm, PyPI or crates.io token is
+# stored anywhere (crates.io needs a token once, for the first version; see below). Push a tag to release:
 #   js-v0.1.1  -> packages/js      -> npm  "sol-feed"
 #   py-v0.1.1  -> packages/python  -> PyPI "sol-feed"
-# The tag must match the version in package.json / pyproject.toml or the job fails before
-# publishing. Each registry must list this repo + "release.yml" + the environment below as a
-# trusted publisher.
+#   rs-v0.1.1  -> packages/rust    -> crates.io "sol-feed"
+# The tag must match the version in package.json / pyproject.toml / Cargo.toml or the job fails
+# before publishing. Each registry must list this repo + "release.yml" + the environment below as a
+# trusted publisher. crates.io only allows that once the crate exists, so its very first version
+# is published by hand with an API token; every later version goes through this workflow.
 name: release
 
 on:
   push:
-    tags: ["js-v*", "py-v*"]
+    tags: ["js-v*", "py-v*", "rs-v*"]
 
 permissions:
   contents: read
@@ -73,3 +75,28 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: packages/python/dist
+
+  crates-io:
+    if: startsWith(github.ref_name, 'rs-v')
+    runs-on: ubuntu-latest
+    environment: crates-io
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: packages/rust
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update stable --no-self-update && rustup default stable
+      - name: Tag matches Cargo.toml
+        run: |
+          want="${GITHUB_REF_NAME#rs-v}"
+          have="$(cargo metadata --no-deps --format-version 1 | python3 -c 'import json,sys; print(json.load(sys.stdin)["packages"][0]["version"])')"
+          [ "$want" = "$have" ] || { echo "tag $want != Cargo.toml $have"; exit 1; }
+      - run: cargo test
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}

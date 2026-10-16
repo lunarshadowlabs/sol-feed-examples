@@ -39,7 +39,8 @@ raydium_cpmm    sell 42678.171662 CCVYpFakBd4kkwn7G4rvbpaiB5pGJwUpiNwNYrkC5ygQ @
 orca            buy  70.27478926 J3NKxxXZcnNiMjKw9hYb2K4LUxgwB6t1FtPtQVsv3KFr @ 0.003511809620473275
 ```
 
-The examples are deliberately bare: one connection, no reconnect. For production use, the client
+The Python and TypeScript examples are deliberately bare: one connection, no reconnect. The Rust
+example uses the `sol-feed` crate. For production use, the client
 packages below reconnect with backoff and resume from where they left off.
 
 ## Client packages
@@ -48,6 +49,7 @@ packages below reconnect with backoff and resume from where they left off.
 |---|---|---|
 | Python | `pip install sol-feed` | [`packages/python`](packages/python) |
 | JavaScript / TypeScript | `npm install sol-feed` | [`packages/js`](packages/js) |
+| Rust | `cargo add sol-feed` | [`packages/rust`](packages/rust) |
 
 ```python
 import asyncio, os

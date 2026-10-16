@@ -6,8 +6,5 @@ license = "MIT"
 publish = false
 
 [dependencies]
-futures-util = { version = "0.3", default-features = false }
-rustls = { version = "0.23", default-features = false, features = ["ring"] }   # TLS crypto: exactly one provider
-serde_json = "1"
+sol-feed = { path = "../../packages/rust" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-tokio-tungstenite = { version = "0.28", features = ["rustls-tls-webpki-roots"] }

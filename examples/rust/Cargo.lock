@@ -283,6 +283,7 @@ version = "0.23.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d41d731c7d2f962d1ccc364cec258de3c0e93b38c2fb3ba97ac74513048d634"
 dependencies = [
+ "log",
  "once_cell",
  "ring",
  "rustls-pki-types",
@@ -387,14 +388,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "stream-swaps"
-version = "0.1.0"
+name = "sol-feed"
+version = "0.1.1"
 dependencies = [
  "futures-util",
  "rustls",
  "serde_json",
  "tokio",
  "tokio-tungstenite",
+ "webpki-roots 1.0.9",
+]
+
+[[package]]
+name = "stream-swaps"
+version = "0.1.0"
+dependencies = [
+ "sol-feed",
+ "tokio",
 ]
 
 [[package]]
