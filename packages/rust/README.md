@@ -54,8 +54,10 @@ decimal string (`"915407.038388"`).
 
 Filters run on the server. Names are in the [docs](https://lunarshadowlabs.com/docs/).
 
-```rust,ignore
-let feed = Feed::new(key)
+```rust
+use sol_feed::Feed;
+
+let feed = Feed::new("<your API key>")
     .kinds(["swap", "launch"])           // event kinds
     .venues(["pump", "pumpswap"])        // venues
     .watch(["<mint, pool or wallet>"]);  // a wallet matches every event it is the actor of
