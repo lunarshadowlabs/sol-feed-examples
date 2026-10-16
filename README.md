@@ -1,4 +1,4 @@
-# Lunar Shadow Labs feed — examples and clients
+# Lunar Shadow Labs feed: examples and clients
 
 Stream decoded Solana DEX swaps in about 20 lines of Python, TypeScript or Rust.
 
@@ -7,6 +7,8 @@ completion, migration, pool creation and liquidity change on 12 Solana venues ov
 already decoded into one JSON shape, with Token-2022 mint flags (transfer fees, freeze authority,
 permanent delegate, …) on both sides of every trade. No IDLs, no account parsing, no per-venue code.
 **Market data only.**
+
+Docs: https://lunarshadowlabs.com/docs/ (every message type, filters, resume). Website and 3-day free trial: https://lunarshadowlabs.com/
 
 Venues: pump.fun, PumpSwap, Raydium LaunchLab (bonk.fun, StonkFun, …), Meteora DBC, Raydium AMM v4 /
 CPMM / CLMM, PancakeSwap v3, Orca Whirlpool, Meteora DLMM / DAMM v1 / DAMM v2.
