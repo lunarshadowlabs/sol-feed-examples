@@ -43,6 +43,7 @@ use tokio::net::TcpStream;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tokio_tungstenite::tungstenite::http::HeaderValue;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::tungstenite::{self, Message as WsMessage};
 use tokio_tungstenite::{Connector, MaybeTlsStream, WebSocketStream};
 
@@ -426,8 +427,8 @@ async fn next_message<F: BorrowMut<Feed>>(st: &mut State<F>) -> Result<Message, 
             )))),
         };
         let reason = match frame {
-            Some(Ok(WsMessage::Text(text))) => {
-                let v: Value = serde_json::from_str(text.as_str()).map_err(Error::Decode)?;
+            Some(Ok(frame @ (WsMessage::Text(_) | WsMessage::Binary(_)))) => {
+                let v: Value = serde_json::from_slice(&frame.into_data()).map_err(Error::Decode)?;
                 match st.feed.borrow_mut().observe(v) {
                     Some(m) => return Ok(m),
                     None => continue,
@@ -444,7 +445,7 @@ async fn next_message<F: BorrowMut<Feed>>(st: &mut State<F>) -> Result<Message, 
                 format!("closed {code} {reason}").trim_end().to_string()
             }
             Some(Ok(WsMessage::Close(None))) | None => "closed by server".to_string(),
-            Some(Ok(_)) => continue, // ping, pong, binary
+            Some(Ok(_)) => continue, // ping, pong (answered by tungstenite)
             Some(Err(e)) => e.to_string(),
         };
         st.ws = None;
@@ -495,7 +496,9 @@ async fn connect(feed: &Feed) -> Result<Ws, Ended> {
         .map_err(|_| Ended::Fatal(Error::Auth("the key is not a valid HTTP header value".into())))?;
     req.headers_mut().insert("Authorization", auth);
     let connector = tls_connector().map_err(|e| Ended::Fatal(Error::Feed(format!("TLS setup failed: {e}"))))?;
-    let fut = tokio_tungstenite::connect_async_tls_with_config(req, None, false, Some(connector));
+    // no size limits, like the Python client: a large message must not become a reconnect loop
+    let config = WebSocketConfig::default().max_message_size(None).max_frame_size(None);
+    let fut = tokio_tungstenite::connect_async_tls_with_config(req, Some(config), false, Some(connector));
     match tokio::time::timeout(CONNECT_TIMEOUT, fut).await {
         Err(_) => Err(Ended::Retry(format!("connect timed out after {}s", CONNECT_TIMEOUT.as_secs()))),
         Ok(Ok((ws, _))) => Ok(ws),

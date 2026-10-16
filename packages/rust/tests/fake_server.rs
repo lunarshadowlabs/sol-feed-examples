@@ -77,7 +77,12 @@ async fn fake(script: impl Fn(usize) -> Conn + Send + Sync + 'static) -> Fake {
                 match action {
                     Some(Conn::Hold(msgs)) => {
                         for m in msgs {
-                            let _ = ws.send(WsMessage::text(m.to_string())).await;
+                            let frame = if m.get("binary") == Some(&Value::Bool(true)) {
+                                WsMessage::binary(m.to_string().into_bytes())
+                            } else {
+                                WsMessage::text(m.to_string())
+                            };
+                            let _ = ws.send(frame).await;
                         }
                         while let Some(Ok(_)) = ws.next().await {}
                     }
@@ -143,6 +148,23 @@ async fn hello_and_heartbeat_are_not_yielded_and_a_message_exposes_its_fields() 
     assert_eq!(m.seq(), Some(1));
     assert_eq!(m["venue"], "pump");
     assert_eq!(m.value()["base_amount"], "5");
+}
+
+#[tokio::test]
+async fn binary_json_frames_and_large_messages_are_delivered() {
+    let big = "x".repeat(20 << 20); // over tungstenite's 16 MiB default frame limit
+    let srv = fake(move |_| {
+        Conn::Hold(vec![
+            json!({"kind":"hello","seq":0,"epoch":1}),
+            json!({"kind":"swap","seq":1,"binary":true}),
+            json!({"kind":"swap","seq":2,"pad":big}),
+        ])
+    })
+    .await;
+    let mut feed = Feed::new("k").url(&srv.url);
+    let mut s = feed.stream();
+    assert_eq!(seq(&next(&mut s).await), 1);
+    assert_eq!(seq(&next(&mut s).await), 2);
 }
 
 #[tokio::test]
